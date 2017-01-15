@@ -1,11 +1,10 @@
 {
-  "frameworks": {
-    "net46":{
-      "dependencies": {
-        "Newtonsoft.Json": "9.0.1",
-        "mveith.GoodreadsApi": "0.2",
-        "FSharp.Data": "2.3.2"
-      }
+    "frameworks": {
+        "net46": {
+            "dependencies": {
+                "Newtonsoft.Json": "9.0.1",
+                "mveith.GoodreadsApi": "0.3.1"
+            }
+        }
     }
-  }
 }
