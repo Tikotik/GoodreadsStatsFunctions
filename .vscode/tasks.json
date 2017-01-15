@@ -1,0 +1,18 @@
+{
+    "version": "0.1.0",
+    "command": "cmd",
+    "isShellCommand": true,
+    "args": ["/C"],
+    "showOutput": "always",
+    "suppressTaskName": true,
+    "tasks": [{
+            "taskName": "nuget",
+            "args": ["nuget restore"]
+        },
+        {
+            "taskName": "run functions",
+            "isBuildCommand": true,
+            "args": ["func host start --cors *"]
+        }
+    ]
+}
