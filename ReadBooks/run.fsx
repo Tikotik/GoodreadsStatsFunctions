@@ -2,6 +2,7 @@
 #r "Newtonsoft.Json"
 
 #load "../Model.fsx"
+#load "JsonConverter.fsx"
 
 open System
 open System.Net
@@ -10,13 +11,7 @@ open GoodreadsStats.Model
 open Newtonsoft.Json
 open System.Configuration
 open Model
-
-type ReadBook = 
-    { ReadAt : DateTime option
-      StartedAt : DateTime option
-      NumPages : int option
-      BookTitle : string
-      AuthorName : string}
+open JsonConverter
 
 let reviews accessData = 
     let user = getUser accessData
@@ -24,9 +19,16 @@ let reviews accessData =
 
 let createBook (r : Review) = 
     let author = r.Book.Authors |> Seq.head
-    { ReadAt = r.ReadAt
-      StartedAt = r.StartedAt
-      NumPages = r.Book.NumPages
+    let readData = 
+        match (r.ReadAt, r.StartedAt) with
+        | (Some readAt, Some startedAt) -> Some {ReadData.StartedAt = startedAt;  ReadAt = readAt }
+        | (_, _) -> None
+        
+    { ReadData = readData
+      NumPages = 
+        match r.Book.NumPages with
+        | Some numPages -> numPages
+        | None -> 0
       BookTitle = r.Book.Title
       AuthorName = author.Name}
 
@@ -51,7 +53,7 @@ let Run(req: HttpRequestMessage, log: TraceWriter) =
                 |> Seq.map createBook
                 |> Seq.toArray
             
-            let result = JsonConvert.SerializeObject  readBooks
+            let result = JsonConvert.SerializeObject(readBooks, JsonConverter())
 
             return req.CreateResponse(HttpStatusCode.OK, result)
         with
