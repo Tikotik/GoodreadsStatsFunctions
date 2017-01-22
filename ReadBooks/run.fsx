@@ -1,17 +1,25 @@
 #r "System.Net.Http"
 #r "Newtonsoft.Json"
 
-#load "../Model.fsx"
 #load "JsonConverter.fsx"
 
 open System
 open System.Net
 open GoodreadsApi
-open GoodreadsStats.Model
 open Newtonsoft.Json
 open System.Configuration
 open Model
 open JsonConverter
+
+type ReadData=
+    { ReadAt : DateTime
+      StartedAt : DateTime}
+
+type ReadBook = 
+    { ReadData : ReadData option
+      NumPages : int
+      BookTitle : string
+      AuthorName : string}
 
 let reviews accessData = 
     let user = getUser accessData

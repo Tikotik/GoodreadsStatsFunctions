@@ -1,13 +1,15 @@
 #r "System.Net.Http"
 #r "Newtonsoft.Json"
 
-#load "../Model.fsx"
-
 open System.Net
 open GoodreadsApi
-open GoodreadsStats.Model
 open Newtonsoft.Json
 open System.Configuration
+
+type AuthorizationUserData = 
+    { Token : string
+      TokenSecret : string
+      Url : string }
 
 let Run(req: HttpRequestMessage, log: TraceWriter) =
     async {
