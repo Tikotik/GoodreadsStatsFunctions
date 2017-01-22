@@ -1,8 +1,11 @@
 #r "System.Net.Http"
 #r "Newtonsoft.Json"
 
+#load "../Configuration.fsx"
+
 open System.Net
 open GoodreadsApi
+open Configuration
 open Newtonsoft.Json
 open System.Configuration
 
@@ -18,9 +21,6 @@ let Run(req: HttpRequestMessage, log: TraceWriter) =
             pair.Value
         let token = queryValue "token"
         let tokenSecret = queryValue "tokenSecret"
-
-        let clientKey = ConfigurationManager.AppSettings.["clientKey"]
-        let clientSecret = ConfigurationManager.AppSettings.["clientSecret"]
  
         let (token, tokenSecret) = getAccessToken clientKey clientSecret token tokenSecret
         let accessData = getAccessData clientKey clientSecret token tokenSecret

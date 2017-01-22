@@ -2,9 +2,11 @@
 #r "Newtonsoft.Json"
 
 #load "JsonConverter.fsx"
+#load "../Configuration.fsx"
 
 open System
 open System.Net
+open Configuration
 open GoodreadsApi
 open Newtonsoft.Json
 open System.Configuration
@@ -42,10 +44,7 @@ let createBook (r : Review) =
 
 let Run(req: HttpRequestMessage, log: TraceWriter) =    
     async {
-        try 
-            let clientKey = ConfigurationManager.AppSettings.["clientKey"]
-            let clientSecret = ConfigurationManager.AppSettings.["clientSecret"]
-            
+        try    
             let queryValue key = 
                 let pair = req.GetQueryNameValuePairs() |> Seq.find (fun q -> q.Key = key)
                 pair.Value

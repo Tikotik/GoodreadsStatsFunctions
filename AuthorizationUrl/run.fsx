@@ -1,7 +1,10 @@
 #r "System.Net.Http"
 #r "Newtonsoft.Json"
 
+#load "../Configuration.fsx"
+
 open System.Net
+open Configuration
 open GoodreadsApi
 open Newtonsoft.Json
 open System.Configuration
@@ -13,9 +16,6 @@ type AuthorizationUserData =
 
 let Run(req: HttpRequestMessage, log: TraceWriter) =
     async {
-        let clientKey = ConfigurationManager.AppSettings.["clientKey"]
-        let clientSecret = ConfigurationManager.AppSettings.["clientSecret"]
-
         let queryValue key = 
             let pair = req.GetQueryNameValuePairs() |> Seq.find (fun q -> q.Key = key)
             pair.Value
