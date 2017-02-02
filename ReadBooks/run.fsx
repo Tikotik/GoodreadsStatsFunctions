@@ -21,11 +21,8 @@ type ReadBook =
     { ReadData : ReadData option
       NumPages : int
       BookTitle : string
-      AuthorName : string}
-
-let reviews accessData = 
-    let user = getUser accessData
-    getAllReviews accessData user.Id "read" "date_read"
+      AuthorName : string
+      ReviewId : int }
 
 let createBook (r : Review) = 
     let author = r.Book.Authors |> Seq.head
@@ -40,7 +37,8 @@ let createBook (r : Review) =
         | Some numPages -> numPages
         | None -> 0
       BookTitle = r.Book.Title
-      AuthorName = author.Name}
+      AuthorName = author.Name
+      ReviewId = r.Id }
 
 let Run(req: HttpRequestMessage, log: TraceWriter) =    
     async {
@@ -50,13 +48,18 @@ let Run(req: HttpRequestMessage, log: TraceWriter) =
                 pair.Value
             let token = queryValue "token"
             let tokenSecret = queryValue "tokenSecret"
+            
+            let perPage = queryValue "perPage" |> int
+            let pageNumber = queryValue "page" |> int
 
             let accessData = getAccessData clientKey clientSecret token tokenSecret
             
-            let reviews = reviews accessData |> Seq.toArray
+            let user = getUser accessData
+
+            let reviews = getReviewsOnPage accessData user.Id "read" "date_read" perPage pageNumber
             
             let readBooks = 
-                reviews
+                reviews.Reviews
                 |> Seq.map createBook
                 |> Seq.toArray
             
