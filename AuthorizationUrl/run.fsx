@@ -1,16 +1,12 @@
 #load "../FunctionPattern.fsx"
 
-#r "Microsoft.Azure.WebJobs.Host"
-#r "System.Net.Http"
-#r "System.Web.Http"
-
+#load "../Utils.fsx"
 #load "../Configuration.fsx"
 
-open Microsoft.Azure.WebJobs.Host
-open System.Net.Http
 open Configuration
 open FunctionPattern
 open Newtonsoft.Json
+open Utils
 
 open GoodreadsApi
 
@@ -19,16 +15,11 @@ type AuthorizationUserData =
       TokenSecret : string
       Url : string }
 
-let getAuthorizationUrl (req: HttpRequestMessage) =
-    let queryValue key= 
-        let pair = req.GetQueryNameValuePairs() |> Seq.find (fun q -> q.Key = key)
-        pair.Value
-
-    let clientSideUrl = queryValue "clientSideUrl"
+let getAuthorizationUrl req =
+    let clientSideUrl = queryValue req "clientSideUrl"
 
     let (authorizationUrl, token, tokenSecret) = getAuthorizationData clientKey clientSecret clientSideUrl
     JsonConvert.SerializeObject { Token = token; TokenSecret = tokenSecret; Url = authorizationUrl}
-    
 
-let Run(req: HttpRequestMessage, log: TraceWriter) =
+let Run(req, log) =
     azureFunction req log getAuthorizationUrl

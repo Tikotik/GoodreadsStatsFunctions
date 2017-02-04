@@ -1,16 +1,12 @@
 #load "../FunctionPattern.fsx"
 
-#r "Microsoft.Azure.WebJobs.Host"
-#r "System.Net.Http"
-#r "System.Web.Http"
-
+#load "../Utils.fsx"
 #load "../Configuration.fsx"
 
-open Microsoft.Azure.WebJobs.Host
-open System.Net.Http
 open Configuration
 open FunctionPattern
 open Newtonsoft.Json
+open Utils
 
 open GoodreadsApi
 
@@ -19,17 +15,14 @@ type LoggedUserData =
       AccessTokenSecret : string
       UserName : string}
 
-let autheticate (req: HttpRequestMessage)=
-    let queryValue key = 
-        let pair = req.GetQueryNameValuePairs() |> Seq.find (fun q -> q.Key = key)
-        pair.Value
-    let token = queryValue "token"
-    let tokenSecret = queryValue "tokenSecret"
+let autheticate req =
+    let token = queryValue req "token"
+    let tokenSecret = queryValue req "tokenSecret"
 
     let (token, tokenSecret) = getAccessToken clientKey clientSecret token tokenSecret
     let accessData = OAuth.getAccessData clientKey clientSecret token tokenSecret
     let user = getUser accessData
     JsonConvert.SerializeObject { AccessToken = token; AccessTokenSecret = tokenSecret; UserName = user.Name }
 
-let Run(req: HttpRequestMessage, log: TraceWriter) =
+let Run(req, log) =
     azureFunction req log autheticate

@@ -1,19 +1,14 @@
 #load "../FunctionPattern.fsx"
 
-#r "Microsoft.Azure.WebJobs.Host"
-#r "System.Net.Http"
-#r "System.Web.Http"
-
-#load "../Configuration.fsx"
+#load "../Utils.fsx"
 #load "JsonConverter.fsx"
 
 open System
 open Microsoft.Azure.WebJobs.Host
 open System.Net.Http
-open Configuration
 open FunctionPattern
 open Newtonsoft.Json
-
+open Utils
 open GoodreadsApi
 open JsonConverter
 
@@ -32,7 +27,7 @@ let createBook (r : Model.Review) =
     let author = r.Book.Authors |> Seq.head
     let readData = 
         match (r.ReadAt, r.StartedAt) with
-        | (Some readAt, Some startedAt) -> Some {ReadData.StartedAt = startedAt;  ReadAt = readAt }
+        | (Some readAt, Some startedAt) -> Some { ReadData.StartedAt = startedAt;  ReadAt = readAt }
         | (_, _) -> None
         
     { ReadData = readData
@@ -44,18 +39,11 @@ let createBook (r : Model.Review) =
       AuthorName = author.Name
       ReviewId = r.Id }
 
-let getReviews (req: HttpRequestMessage)=
-    let queryValue key = 
-        let pair = req.GetQueryNameValuePairs() |> Seq.find (fun q -> q.Key = key)
-        pair.Value
-    let token = queryValue "token"
-    let tokenSecret = queryValue "tokenSecret"
-    
-    let perPage = queryValue "perPage" |> int
-    let pageNumber = queryValue "page" |> int
+let getReviews req =
+    let perPage = queryValue req "perPage" |> int
+    let pageNumber = queryValue req "page" |> int
 
-    let accessData = getAccessData clientKey clientSecret token tokenSecret
-    
+    let accessData = accessData req    
     let user = getUser accessData
 
     let reviews = getReviewsOnPage accessData user.Id "read" "date_read" perPage pageNumber
@@ -67,5 +55,5 @@ let getReviews (req: HttpRequestMessage)=
     
     JsonConvert.SerializeObject(readBooks, JsonConverter())
 
-let Run(req: HttpRequestMessage, log: TraceWriter) =    
+let Run(req, log) =    
     azureFunction req log getReviews
