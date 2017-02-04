@@ -3,7 +3,7 @@
         "net46": {
             "dependencies": {
                 "Newtonsoft.Json": "9.0.1",
-                "mveith.GoodreadsApi": "0.3.1"
+                "mveith.GoodreadsApi": "0.5.0"
             }
         }
     }
