@@ -1,7 +1,7 @@
 #load "../FunctionPattern.fsx"
 
 #load "../Utils.fsx"
-#load "JsonConverter.fsx"
+#load "../JsonConverter.fsx"
 
 open System
 open Microsoft.Azure.WebJobs.Host
@@ -12,7 +12,7 @@ open Utils
 open GoodreadsApi
 open JsonConverter
 
-type ReadData=
+type ReadData =
     { ReadAt : DateTime
       StartedAt : DateTime}
 
