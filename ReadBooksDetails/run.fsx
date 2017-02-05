@@ -2,6 +2,7 @@
 
 #load "../Utils.fsx"
 #load "../JsonConverter.fsx"
+#load "GenresList.fsx"
 
 open Microsoft.Azure.WebJobs.Host
 open System.Net.Http
@@ -10,13 +11,20 @@ open Utils
 open Newtonsoft.Json
 open JsonConverter
 open GoodreadsApi
+open GenresList
 
 type BookDetail =
     { Id : int
-      Shelves : string[] }
+      Genres : string[] }
 
-let getDetails (log:TraceWriter) req =
+let intersect col1 col2 =
+    Set.intersect (Set.ofArray col1) (Set.ofArray col2) |> Set.toArray
 
+let genres (d:Model.BookDetail) =
+    let shelves = d.PopularShelves |> Seq.map (fun (s,c) -> s) |> Seq.toArray
+    intersect shelves goodreadsGenres
+
+let getDetails req =
     let perPage = queryValue req "perPage" |> int
     let pageNumber = queryValue req "page" |> int
     
@@ -25,12 +33,11 @@ let getDetails (log:TraceWriter) req =
     let reviews = getReviewsOnPage accessData user.Id "read" "date_read" perPage pageNumber
     
     let bookId (r:Model.Review) = r.Book.Id 
-    let detail id=
-        getBookDetail accessData id
-    let createDetail (d:Model.BookDetail ) = { Id = d.Id; Shelves = d.PopularShelves |> Seq.map (fun (s,c) -> s) |> Seq.toArray }
+    let detail = getBookDetail accessData
+    let createDetail (d:Model.BookDetail) = { Id = d.Id; Genres = genres d }
 
     let details = reviews.Reviews |> Seq.map (bookId >> detail >> createDetail) |> Seq.toArray
     JsonConvert.SerializeObject(details, JsonConverter())
 
 let Run(req, log) =    
-    azureFunction req log (getDetails log)
+    azureFunction req log getDetails
