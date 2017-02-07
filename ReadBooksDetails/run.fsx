@@ -15,7 +15,8 @@ open GenresList
 
 type BookDetail =
     { Id : int
-      Genres : string[] }
+      Genres : string[]
+      OriginalPublicationYear : int option }
 
 let intersect col1 col2 =
     Set.intersect (Set.ofArray col1) (Set.ofArray col2) |> Set.toArray
@@ -34,7 +35,10 @@ let getDetails req =
     
     let bookId (r:Model.Review) = r.Book.Id 
     let detail = getBookDetail accessData
-    let createDetail (d:Model.BookDetail) = { Id = d.Id; Genres = genres d }
+    let createDetail (d:Model.BookDetail) = 
+        { Id = d.Id; 
+          Genres = genres d; 
+          OriginalPublicationYear = d.Work.OriginalPublicationYear }
 
     let details = reviews.Reviews |> Seq.map (bookId >> detail >> createDetail) |> Seq.toArray
     JsonConvert.SerializeObject(details, JsonConverter())
