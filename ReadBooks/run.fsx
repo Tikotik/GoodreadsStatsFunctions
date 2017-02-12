@@ -14,14 +14,21 @@ open JsonConverter
 
 type ReadData =
     { ReadAt : DateTime
-      StartedAt : DateTime}
+      StartedAt : DateTime }
 
 type ReadBook = 
     { ReadData : ReadData option
       NumPages : int
       BookTitle : string
       AuthorName : string
-      ReviewId : int }
+      ReviewId : int 
+      Shelves : string[] }
+
+let shelves (r : Model.Review) = 
+    r.Shelves 
+    |> Seq.filter (fun s -> not s.Exclusive) 
+    |> Seq.map (fun s -> s.Name) 
+    |> Seq.toArray
 
 let createBook (r : Model.Review) = 
     let author = r.Book.Authors |> Seq.head
@@ -37,7 +44,8 @@ let createBook (r : Model.Review) =
         | None -> 0
       BookTitle = r.Book.Title
       AuthorName = author.Name
-      ReviewId = r.Id }
+      ReviewId = r.Id 
+      Shelves = shelves r }
 
 let getReviews req =
     let perPage = queryValue req "perPage" |> int
