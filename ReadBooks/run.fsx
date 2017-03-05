@@ -22,7 +22,8 @@ type ReadBook =
       BookTitle : string
       AuthorName : string
       ReviewId : int 
-      Shelves : string[] }
+      Shelves : string[] 
+      SmallImageUrl : string}
 
 let shelves (r : Model.Review) = 
     r.Shelves 
@@ -45,7 +46,8 @@ let createBook (r : Model.Review) =
       BookTitle = r.Book.Title
       AuthorName = author.Name
       ReviewId = r.Id 
-      Shelves = shelves r }
+      Shelves = shelves r 
+      SmallImageUrl = r.Book.SmallImageUrl}
 
 let getReviews req =
     let perPage = queryValue req "perPage" |> int
