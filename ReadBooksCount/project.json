@@ -2,7 +2,7 @@
     "frameworks": {
         "net46": {
             "dependencies": {
-                "mveith.GoodreadsApi": "0.6.1"
+                "mveith.GoodreadsApi": "0.6.3"
             }
         }
     }

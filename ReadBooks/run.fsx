@@ -21,10 +21,10 @@ type ReadBook =
       NumPages : int
       BookTitle : string
       AuthorName : string
-      ReviewId : int 
+      ReviewId : int64
       Shelves : string[] 
       SmallImageUrl : string
-      BookId : int }
+      BookId : int64 }
 
 let shelves (r : Model.Review) = 
     r.Shelves 

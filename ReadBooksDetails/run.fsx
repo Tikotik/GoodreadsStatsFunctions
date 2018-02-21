@@ -16,7 +16,7 @@ open GenresList
 open LanguageMap
 
 type BookDetail =
-    { Id : int
+    { Id : int64
       Genres : string[]
       OriginalPublicationYear : int option
       Language : string option }
